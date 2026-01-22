@@ -11,7 +11,10 @@ load_dotenv()
 
 app = FastAPI()
 
-API_KEY = "sk_test_123456789"
+API_KEY = os.getenv("API_KEY")
+if not API_KEY:
+    raise RuntimeError("API_KEY not set in environment")
+
 ALLOWED_LANGUAGES = {"Tamil", "English", "Hindi", "Malayalam", "Telugu"}
 ALLOWED_AUDIO_FORMAT = "mp3"
 
@@ -84,7 +87,7 @@ def voice_detection(
         )
 
     try:
-        audio_bytes = base64.b64decode(request.audioBase64)
+        audio_bytes = base64.b64decode(request.audioBase64, validate=True)
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid Base64 audio data")
 
@@ -95,12 +98,13 @@ def voice_detection(
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to process audio file")
     
-    result = classify_audio(temp_audio_path)
+    try:
+        result = classify_audio(temp_audio_path)
+    finally:
+        if os.path.exists(temp_audio_path):
+            os.remove(temp_audio_path)
 
-    if os.path.exists(temp_audio_path):
-        os.remove(temp_audio_path)
-
-        return {
+    return {
         "status": "success",
         "language": request.language,
         "classification": result["label"],
