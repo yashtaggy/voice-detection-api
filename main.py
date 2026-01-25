@@ -2,6 +2,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from ml_engine import classify_audio
 from dotenv import load_dotenv
 import base64
 import tempfile
@@ -53,17 +54,6 @@ class VoiceDetectionRequest(BaseModel):
     language: str
     audioFormat: str
     audioBase64: str
-
-def classify_audio(audio_path: str) -> dict:
-    """
-    Placeholder for ML model inference.
-    This will be replaced by ML team implementation.
-    """
-    return {
-        "label": "HUMAN",
-        "confidence": 0.50,
-        "explanation": "Dummy classification (model not integrated)"
-    }
 
 @app.get("/protected")
 def protected_endpoint(x_api_key: str = Header(None)):
