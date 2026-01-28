@@ -1,0 +1,13 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+
+RawNet
+RawNet2
+RawNet3
+models
+test.mp3
+
+.env
