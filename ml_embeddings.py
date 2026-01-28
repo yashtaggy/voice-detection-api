@@ -1,6 +1,7 @@
 import torch
 import torchaudio
 import numpy as np
+import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 
 MODEL_NAME = "facebook/wav2vec2-base"
@@ -10,9 +11,9 @@ processor = Wav2Vec2Processor.from_pretrained(MODEL_NAME)
 model = Wav2Vec2Model.from_pretrained(MODEL_NAME)
 model.eval()
 
-def load_audio(path):
-    waveform, sr = torchaudio.load(path)
-    waveform = waveform.mean(dim=0)
+def _load_audio(path):
+    audio, sr = librosa.load(path, sr=TARGET_SR, mono=True)
+    return torch.tensor(audio)
 
     if sr != TARGET_SR:
         waveform = torchaudio.functional.resample(waveform, sr, TARGET_SR)
@@ -20,7 +21,7 @@ def load_audio(path):
     return waveform
 
 if __name__ == "__main__":
-    audio = load_audio("test.mp3")
+    audio = _load_audio("test.mp3")
 
     inputs = processor(
         audio,

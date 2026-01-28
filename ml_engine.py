@@ -1,5 +1,6 @@
 import torch
-import torchaudio
+import librosa
+import torch
 import numpy as np
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 
@@ -12,11 +13,8 @@ wav2vec = Wav2Vec2Model.from_pretrained(MODEL_NAME)
 wav2vec.eval()
 
 def _load_audio(path):
-    waveform, sr = torchaudio.load(path)
-    waveform = waveform.mean(dim=0)
-    if sr != TARGET_SR:
-        waveform = torchaudio.functional.resample(waveform, sr, TARGET_SR)
-    return waveform
+    audio, sr = librosa.load(path, sr=TARGET_SR, mono=True)
+    return torch.tensor(audio)
 
 def _extract_features(audio_path):
     audio = _load_audio(audio_path)
